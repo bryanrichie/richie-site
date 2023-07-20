@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Flex, Image, Spinner, Text, VStack } from '@chakra-ui/react';
+import React from 'react';
+import { Flex, Image, Spinner, Text, VStack } from '@chakra-ui/react';
 import '../assets/AdviceGeneratorApp/css/font.css';
 
 interface AdviceSlip {
@@ -10,9 +10,9 @@ interface AdviceSlip {
 }
 
 const AdviceGeneratorApp = () => {
-  const [advice, setAdvice] = useState<AdviceSlip>();
+  const [advice, setAdvice] = React.useState<AdviceSlip>();
 
-  useEffect(() => {
+  React.useEffect(() => {
     fetch('https://api.adviceslip.com/advice')
       .then((response) => response.json())
       .then((data: AdviceSlip) => {
