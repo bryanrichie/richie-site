@@ -1665,6 +1665,11 @@ chalk@^4.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+check-if-word@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/check-if-word/-/check-if-word-1.2.1.tgz#60a9cb8ed99f0321e7abddb05201195b80094b19"
+  integrity sha512-FrB/d+r+ITgMjxGfIS1tE7OlfI2bNSARSCNyC6el23ESDP1ugP1MJPts0ecYawiO6xPE2msJhAYtqBgAMD8oPw==
+
 color-convert@^1.9.0:
   version "1.9.3"
   resolved "https://registry.yarnpkg.com/color-convert/-/color-convert-1.9.3.tgz#bb71850690e1f136567de629d2d5471deda4c1e8"

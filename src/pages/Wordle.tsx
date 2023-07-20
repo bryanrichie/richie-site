@@ -1,12 +1,14 @@
 import React from 'react';
 import { faker } from '@faker-js/faker';
-import { Box, Flex, Grid, GridItem, Heading, Text, background } from '@chakra-ui/react';
+import { Box, Flex, Grid, GridItem, Heading } from '@chakra-ui/react';
 
 const Wordle = () => {
   const [word, setWord] = React.useState<string>('');
   const [guess, setGuess] = React.useState<string>('');
   const [guesses, setGuesses] = React.useState<string[]>([]);
   const [guessCount, setGuessCount] = React.useState<number>(0);
+  const [winner, setWinner] = React.useState<boolean>(false);
+  const [loser, setLoser] = React.useState<boolean>(false);
 
   React.useEffect(() => {
     setWord(faker.word.sample(5));
@@ -20,26 +22,42 @@ const Wordle = () => {
         setGuess((prev) => prev.slice(0, -1));
       }
 
-      if (key === 'Enter' && guess.length === 5) {
-        setGuesses((prev) => [...prev, guess]);
-        setGuessCount((prev) => prev + 1);
-        setGuess('');
-      }
-
       if (/^[a-z]$/.test(key) && guess.length < 5) {
         setGuess((prev) => prev + key);
       }
+
+      if (key === 'Enter') {
+        if (guess.length === 5) {
+          if (word === guess) {
+            setGuesses((prev) => [...prev, guess]);
+            setGuessCount((prev) => prev + 1);
+            setGuess('');
+            setWinner(true);
+          } else if (guesses.length === 5) {
+            setGuesses((prev) => [...prev, guess]);
+            setGuessCount((prev) => prev + 1);
+            setGuess('');
+            setLoser(true);
+          } else {
+            setGuesses((prev) => [...prev, guess]);
+            setGuessCount((prev) => prev + 1);
+            setGuess('');
+          }
+        }
+      }
     },
-    [guess]
+    [guess, word, guesses.length]
   );
 
   React.useEffect(() => {
-    document.addEventListener('keyup', handleKeyUp, false);
+    if (!winner) {
+      document.addEventListener('keyup', handleKeyUp, false);
+    }
 
     return () => {
       document.removeEventListener('keyup', handleKeyUp, false);
     };
-  }, [handleKeyUp]);
+  }, [handleKeyUp, winner]);
 
   const handleActiveGuess = guess?.split('').map((letter, index) => {
     return (
@@ -63,7 +81,8 @@ const Wordle = () => {
     const guessLetters = guesses[count]?.split('');
 
     return guessLetters?.map((letter, index) => {
-      console.log(letter, index);
+      const backgroundColor = compareWordToGuess(word, guesses[count], letter, index);
+
       return (
         <GridItem
           width={'100px'}
@@ -75,7 +94,7 @@ const Wordle = () => {
           alignItems={'center'}
           fontSize={'50'}
           fontWeight={'extrabold'}
-          backgroundColor={compareWords(word, guesses[count])}
+          backgroundColor={backgroundColor}
         >
           {letter.toUpperCase()}
         </GridItem>
@@ -83,36 +102,20 @@ const Wordle = () => {
     });
   };
 
-  const compareWords = (word: string, guess: string) => {
-    const wordChars = word.split('');
-    const guessChars = guess.split('');
-
-    const backgroundColor = wordChars.map((char, index) => {
-      if (char === guessChars[index]) {
-        return 'green';
-      } else if (guessChars.includes(char)) {
-        return 'yellow';
-      } else {
-        return 'grey';
-      }
-    });
-
-    return backgroundColor;
+  const compareWordToGuess = (word: string, guess: string, letter: string, index: number) => {
+    if (word[index] === guess[index]) {
+      return 'green';
+    } else if (word.includes(letter) && word[index] !== guess[index]) {
+      return 'yellow';
+    } else {
+      return 'grey';
+    }
   };
 
   return (
-    <Flex
-      flexDir={'column'}
-      align={'center'}
-      bgColor={'hsl(255, 30%, 60%)'}
-      width={'100%'}
-      height={'100vh'}
-    >
+    <Flex flexDir={'column'} align={'center'} width={'100%'} height={'100vh'}>
       <Heading>Wordle</Heading>
-      <Text>Word: {word}</Text>
-      <Text>Attempt: {guessCount}</Text>
       <Flex
-        bgColor={'hsl(150, 50%, 50%)'}
         width={'100%'}
         height={'100%'}
         justify={'center'}
@@ -120,6 +123,9 @@ const Wordle = () => {
         flexDir={'column'}
         gap={6}
       >
+        <Heading display={winner ? 'flex' : 'none'}>YOU WIN!</Heading>
+        <Heading display={loser ? 'flex' : 'none'}>YOU LOSE!</Heading>
+        <Heading display={loser ? 'flex' : 'none'}>WORD - {word.toUpperCase()}</Heading>
         <Box position={'relative'}>
           <Grid templateColumns="repeat(5, 1fr)" gap={6}>
             <GridItem width={'100px'} height={'100px'} border={'2px solid grey'} />
